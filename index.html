@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>苗栗家庭之旅總體計畫</title>
+    <!-- 加載 Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        /* 自定義樣式變數 */
+        :root {
+            --color-primary: #C84B31; /* 標題紅 */
+            --color-secondary: #2D4059; /* 文字深藍 */
+            --color-accent: #EA9010; /* 箭頭/時間橘 */
+            --color-bg: #F8F3E8; /* 背景淺米 */
+            --color-day: #6B9080; /* 細節/備註綠 */
+        }
+
+        body {
+            background-color: var(--color-bg);
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .slide-container {
+            /* 實現響應式：移除固定寬度，使用 max-width */
+            max-width: 1280px; 
+            width: 100%;
+            min-height: 720px;
+            background-color: var(--color-bg);
+            padding: 40px 50px;
+            font-family: 'Inter', sans-serif;
+            color: var(--color-secondary);
+            border-radius: 1rem; 
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        
+        .slide-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 40px;
+            color: var(--color-primary);
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        
+        .divider {
+            height: 3px;
+            background-color: var(--color-primary);
+            margin-bottom: 25px;
+            border-radius: 2px;
+        }
+        
+        /* 區塊標題樣式 */
+        .route-section {
+            margin-bottom: 30px;
+        }
+        
+        .route-section-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 20px; /* 略微加大 */
+            color: var(--color-primary);
+            font-weight: 700;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .route-section-title i {
+            color: var(--color-accent);
+            margin-right: 12px;
+            font-size: 22px;
+        }
+        
+        /* 行車動線流程圖樣式 */
+        .route-flow {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: rgba(107, 144, 128, 0.08);
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 13px;
+            line-height: 1.6;
+            flex-wrap: wrap; 
+        }
+        
+        .route-point {
+            flex: 1;
+            text-align: center;
+            padding: 0 10px;
+            min-width: 100px;
+        }
+        
+        .route-point-label {
+            font-family: 'Playfair Display', serif;
+            font-size: 14px;
+            color: var(--color-primary);
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        
+        .route-point-detail {
+            font-size: 12px;
+            color: var(--color-day);
+        }
+        
+        .route-arrow {
+            color: var(--color-accent);
+            font-size: 20px;
+            margin: 0 8px;
+        }
+
+        /* 表格通用樣式和響應式容器 */
+        .table-responsive-wrapper {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .location-table, .itinerary-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            line-height: 1.5;
+            min-width: 768px; /* 最小寬度防止表格在手機上過度擠壓 */
+            border-radius: 0.5rem;
+            overflow: hidden; /* 確保圓角生效 */
+        }
+        
+        .location-table th, .itinerary-table th {
+            background-color: var(--color-primary);
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
+        }
+        
+        .location-table td, .itinerary-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #E0D5C7;
+            vertical-align: top;
+        }
+        
+        .location-table tr:nth-child(even), .itinerary-table tr:not(:first-child):nth-child(even) {
+            background-color: rgba(234, 144, 16, 0.05);
+        }
+
+        /* 地點資訊表格專用樣式 */
+        .location-name {
+            color: var(--color-primary);
+            font-weight: 600;
+        }
+        .location-detail {
+            color: var(--color-day);
+            font-size: 11px;
+        }
+
+        /* 行程表專用樣式 */
+        .day-label {
+            background-color: rgba(107, 144, 128, 0.15);
+            color: var(--color-day);
+            font-weight: 700;
+            padding: 8px 12px;
+            text-align: center;
+        }
+        
+        .time-cell {
+            color: var(--color-accent);
+            font-weight: 600;
+            width: 80px;
+            text-align: center;
+        }
+        
+        .activity-cell {
+            color: var(--color-secondary);
+        }
+        
+        .meal-cell {
+            color: var(--color-primary);
+            width: 120px;
+        }
+        
+        .note-cell {
+            color: var(--color-day);
+            font-size: 12px;
+            width: 200px;
+        }
+
+        /* 重點提醒樣式 */
+        .highlight-box {
+            background-color: rgba(200, 75, 49, 0.08);
+            border-left: 4px solid var(--color-primary);
+            padding: 15px;
+            margin-top: 30px;
+            border-radius: 4px;
+            font-size: 13px;
+            line-height: 1.8;
+        }
+        
+        .highlight-box strong {
+            color: var(--color-primary);
+        }
+
+        /* 響應式佈局：手機模式 (max-width: 768px) */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            .slide-container {
+                padding: 20px 15px; 
+                min-height: auto;
+            }
+            .slide-title {
+                font-size: 30px;
+            }
+            .route-section-title {
+                font-size: 18px;
+            }
+            
+            /* 路由流程圖 (route-flow) 垂直堆疊 - 來自 drive_route.html 的響應式邏輯 */
+            .route-flow {
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 10px;
+            }
+            .route-point {
+                width: 100%;
+                text-align: left;
+                padding: 10px 0 10px 25px;
+                border-left: 2px solid #E0D5C7;
+                position: relative;
+                margin-bottom: 5px;
+            }
+            .route-arrow {
+                display: none;
+            }
+            .route-point::before {
+                content: "\f041"; 
+                font-family: 'Font Awesome 6 Free';
+                font-weight: 900;
+                color: var(--color-accent);
+                position: absolute;
+                left: -10px; 
+                top: 10px;
+                font-size: 16px;
+                background-color: var(--color-bg);
+                padding: 0 4px;
+                border-radius: 50%;
+            }
+            .route-point:last-child {
+                border-left: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="slide-container">
+        <div class="slide-title">🎉 苗栗家庭之旅總體計畫</div>
+        <div class="text-sm mb-4 text-gray-500">2026/01/29 - 2026/01/31 (初一至初三) • 路線、地點與詳細行程彙整</div>
+        <div class="divider"></div>
+        
+        <!-- ============================================== -->
+        <!-- 1. 行車動線 (總體路線) -->
+        <!-- ============================================== -->
+        <div class="route-section">
+            <div class="route-section-title">
+                <i class="fas fa-route"></i>
+                總體行車動線
+            </div>
+            <div class="route-flow">
+                <div class="route-point">
+                    <div class="route-point-label">台南</div>
+                    <div class="route-point-detail">啟程/終點</div>
+                </div>
+                <div class="route-arrow hidden sm:block">→</div>
+                <div class="route-point">
+                    <div class="route-point-label">台中</div>
+                    <div class="route-point-detail">Day 1 午餐中繼</div>
+                </div>
+                <div class="route-arrow hidden sm:block">→</div>
+                <div class="route-point">
+                    <div class="route-point-label">造橋</div>
+                    <div class="route-point-detail">住宿 (I Sky Villa)</div>
+                </div>
+                <div class="route-arrow hidden sm:block">↔</div>
+                <div class="route-point">
+                    <div class="route-point-label">南庄</div>
+                    <div class="route-point-detail">Day 2 景點</div>
+                </div>
+                <div class="route-arrow hidden sm:block">→</div>
+                <div class="route-point">
+                    <div class="route-point-label">公館</div>
+                    <div class="route-point-detail">Day 3 午餐</div>
+                </div>
+                <div class="route-arrow hidden sm:block">→</div>
+                <div class="route-point">
+                    <div class="route-point-label">台南</div>
+                    <div class="route-point-detail">賦歸</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================== -->
+        <!-- 2. 主要地點資訊 -->
+        <!-- ============================================== -->
+        <div class="route-section">
+            <div class="route-section-title">
+                <i class="fas fa-map-marker-alt"></i>
+                主要地點資訊與用途
+            </div>
+            <div class="table-responsive-wrapper">
+                <table class="location-table">
+                    <thead>
+                        <tr>
+                            <th>地點名稱</th>
+                            <th>縣市/鄉鎮</th>
+                            <th>用途</th>
+                            <th>相對位置與動線</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="location-name">大北京京川菜麵食館</span></td>
+                            <td>台中市 北屯區</td>
+                            <td>Day 1 午餐</td>
+                            <td><span class="location-detail">國道一號/三號沿線，便利性高。</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="location-name">I Sky Villa 戀空民宿</span></td>
+                            <td>苗栗縣 造橋鄉</td>
+                            <td>住宿 (2晚)</td>
+                            <td><span class="location-detail">苗栗西側，靠近國道。是前往南庄、頭份的中繼站，交通便利。</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="location-name">南庄老街</span></td>
+                            <td>苗栗縣 南庄鄉</td>
+                            <td>Day 2 景點/午餐</td>
+                            <td><span class="location-detail">苗栗東北山區，從造橋出發車程較長（約 1 小時），山路注意車速。</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="location-name">棗莊古藝庭園膳坊</span></td>
+                            <td>苗栗縣 公館鄉</td>
+                            <td>Day 3 午餐</td>
+                            <td><span class="location-detail">苗栗中心偏南，靠近公館交流道，規劃在回程南下路線上。</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ============================================== -->
+        <!-- 3. 詳細行程表 -->
+        <!-- ============================================== -->
+        <div class="route-section">
+            <div class="route-section-title">
+                <i class="fas fa-calendar-alt"></i>
+                詳細每日行程 (2026/01/29 - 01/31)
+            </div>
+            <div class="table-responsive-wrapper">
+                <table class="itinerary-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 80px;">日期</th>
+                            <th style="width: 70px;">時間</th>
+                            <th>行程主題與內容</th>
+                            <th style="width: 120px;">餐飲安排</th>
+                            <th style="width: 200px;">交通與注意事項</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td rowspan="4" class="day-label">Day 1<br>(初一)</td>
+                            <td class="time-cell">07:30</td>
+                            <td class="activity-cell"><strong>南下北上迎新年：啟程</strong></td>
+                            <td class="meal-cell"></td>
+                            <td class="note-cell">🚗 台南出發，預計中部與北部親友匯合</td>
+                        </tr>
+                        <tr>
+                            <td class="time-cell">12:30</td>
+                            <td class="activity-cell">午餐：<strong>大北京京川菜麵食館</strong> (台中)</td>
+                            <td class="meal-cell">✅ 京川菜麵食館</td>
+                            <td class="note-cell">🚗 台中：國道沿線休息區附近，<strong>務必提前訂位</strong></td>
+                        </tr>
+                        <tr>
+                            <td class="time-cell">16:00</td>
+                            <td class="activity-cell">抵達民宿 <strong>Check-in</strong></td>
+                            <td class="meal-cell">🏡 I Sky Villa</td>
+                            <td class="note-cell">⚠️ 12人提早確認房間數及停車位</td>
+                        </tr>
+                        <tr>
+                            <td class="time-cell">18:30</td>
+                            <td class="activity-cell">團圓晚餐與家庭時光 (苗栗/竹南合菜)</td>
+                            <td class="meal-cell">🍽️ 苗栗/竹南合菜</td>
+                            <td class="note-cell">⚠️ 初一晚餐難訂，<strong>需提前預訂</strong> (建議竹南車站周邊)</td>
+                        </tr>
+                        
+                        <tr>
+                            <td rowspan="5" class="day-label">Day 2<br>(初二)</td>
+                            <td class="time-cell">08:00</td>
+                            <td class="activity-cell"><strong>客家風情巡禮：南庄老街</strong></td>
+                            <td class="meal-cell">🍞 民宿早餐</td>
+                            <td class="note-cell">🚌 南庄：春節期間人潮極多，建議提早出發</td>
+                        </tr>
+                        <tr>
+                            <td class="time-cell">10:00</td>
+                            <td class="activity-cell">走訪南庄老街 (桂花巷、水汴頭)</td>
+                            <td class="meal-cell"></td>
+                            <td class="note-cell">🚶 <strong>留意長者體力</strong>，慢行並隨時休息</td>
+                        </tr>
+                        <tr>
+                            <td class="time-cell">12:30</td>
+                            <td class="activity-cell">老街午餐</td>
+                            <td class="meal-cell">🍜 客家小吃<br>(豬籠粄、湯圓等)</td>
+                            <td class="note-cell">🚶 建議分散購買小吃，避免單一餐廳等候</td>
+                        </tr>
+                        <tr>
+                            <td class="time-cell">15:00</td>
+                            <td class="activity-cell">周邊景點：向天湖或仙山 (斟酌)</td>
+                            <td class="meal-cell">🌲 環湖步道</td>
+                            <td class="note-cell">向天湖步道較平緩，適合長者。仙山較耗體力。</td>
+                        </tr>
+                        <tr>
+                            <td class="time-cell">18:30</td>
+                            <td class="activity-cell">回程晚餐</td>
+                            <td class="meal-cell">🍽️ 頭份/竹南</td>
+                            <td class="note-cell">🍽️ <strong>提前預訂</strong>，避開返程車流及用餐人潮</td>
+                        </tr>
+                        
+                        <tr>
+                            <td rowspan="3" class="day-label">Day 3<br>(初三)</td>
+                            <td class="time-cell">08:00</td>
+                            <td class="activity-cell">早餐與 <strong>Check-out</strong></td>
+                            <td class="meal-cell">🍞 民宿早餐</td>
+                            <td class="note-cell">🏡 11:00 前 Check-out，整理行李</td>
+                        </tr>
+                        <tr>
+                            <td class="time-cell">12:30</td>
+                            <td class="activity-cell">午餐：<strong>棗莊古藝庭園膳坊</strong> (苗栗公館)</td>
+                            <td class="meal-cell">✅ 棗莊古藝庭園</td>
+                            <td class="note-cell">🚗 公館：順路南下，<strong>強烈建議提前預訂</strong></td>
+                        </tr>
+                        <tr>
+                            <td class="time-cell">14:30</td>
+                            <td class="activity-cell"><strong>南下賦歸</strong></td>
+                            <td class="meal-cell"></td>
+                            <td class="note-cell">⚠️ 初三返鄉車潮大，<strong>預留充足時間</strong>，建議避開尖峰</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ============================================== -->
+        <!-- 4. 重點提醒 -->
+        <!-- ============================================== -->
+        <div class="highlight-box">
+            <strong>⚠️ 重點提醒與緊急備註：</strong><br>
+            1. <strong>國道車潮大</strong>：初一與初三為國道尖峰日，請務必即時查詢路況（如高速公路 1968 App），並預留充足行車時間。<br>
+            2. <strong>餐廳預訂</strong>：所有行程中的餐廳（Day 1 午、晚；Day 2 晚；Day 3 午）皆<strong>強烈建議提前預訂</strong>，以確保 12 人的座位安排。<br>
+            3. <strong>長者關懷</strong>：Day 2 南庄老街人潮眾多，請特別留意兩位長者的體力，安排充足休息時間。<br>
+            4. <strong>民宿時間</strong>：I Sky Villa Check-in 16:00、Check-out 11:00。
+        </div>
+    </div>
+</body>
+</html>
